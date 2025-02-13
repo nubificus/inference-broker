@@ -41,7 +41,9 @@ def upload_file():
 
     try:
         result = esp_client.infer(out.read(), threshold, top_k)
-        return result.to_json(), 200
+        result = result.to_dict()
+        result['application_type']= os.environ("APPLICATION_TYPE", "inference")
+        return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
