@@ -2,6 +2,7 @@ from socket import socket, AF_INET, SOCK_STREAM
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
 import struct
+import os 
 
 THRESHOLD = 0.0
 TOP_K = 10
@@ -14,7 +15,6 @@ class InferenceResponse:
     confidence: float
     scores: list[dict[str, float]]
     inference_time: int
-
 
 class Client:
     def __init__(self, host: str, port: int):
@@ -45,6 +45,7 @@ class Client:
 
         inference_time = (struct.unpack('q', inference_time_data)[0]) / 1000
         client_socket.close()
+        print('got answer from device')
         return InferenceResponse(result=filtered_results[0][0],
                                  confidence=filtered_results[0][1],
                                  scores=filtered_results,

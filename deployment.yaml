@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inference-broker-deployment
+spec:
+  selector:
+    matchLabels:
+      app: inference-broker
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: inference-broker
+    spec:
+      containers:
+      - name: inference-broker
+        image: harbor.nbfc.io/nubificus/iot/inference-broker:ui1
+        ports:
+        - containerPort: 80

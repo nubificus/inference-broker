@@ -5,8 +5,8 @@ WORKDIR /svc
 
 COPY requirements.txt requirements.txt
 RUN rm -rf /var/cache/apk/* && rm -rf /tmp/*
-RUN apk update && apk add --update python3 && rm -rf /var/cache/apk/* && \
-    pip wheel -r requirements.txt --wheel-dir=/svc/wheels
+RUN apk update && apk add --update python3 && rm -rf /var/cache/apk/*
+RUN pip wheel -r requirements.txt --wheel-dir=/svc/wheels
 
 
 FROM python:3.12.3-alpine
@@ -18,8 +18,8 @@ RUN pip install --no-index --find-links=/svc/wheels -r requirements.txt
 WORKDIR /app
 COPY app.py .
 COPY client.py .
+COPY static static
 
 EXPOSE 80
 
-# CMD ["gunicorn", "--workers", "1", "-b", "0.0.0.0:80", "app:app"]
-CMD ["python", "app.py"]
+CMD ["waitress-serve", "--port", "80", "app:app"]
