@@ -54,6 +54,10 @@
                 width: 80%;
             }
         }
+
+        #result-card {
+            margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -76,6 +80,7 @@
             </div>
             <button id="send-button" class="btn btn-primary btn-block">Send</button>
         </div>
+        <div id="result-container" class="d-flex justify-content-center"></div>
     </div>
 
     <!-- jQuery -->
@@ -133,7 +138,7 @@
                     }
                     reader.readAsDataURL(file);
                 } else {
-                    $('#drop-area').text('Drag & Drop File Here or Click to Upload');
+                    $('#drop-area').text(file.name);
                     file = null;
                 }
             }
@@ -158,15 +163,77 @@
                     success: function (response) {
                         $('#send-button').prop('disabled', false);
                         console.log(response);
+                        displayResult(response);
                     },
                     error: function (xhr, status, error) {
                         $('#send-button').prop('disabled', false);
+                        $('#result-container').empty();
                         errMsg = xhr.status + ' Error uploading file: ' + xhr.responseText;
-                        alert(errMsg);
+                        if (xhr.status === 400 || xhr.status === 500) {
+                            displayError(xhr.responseText);
+                            console.log(errMsg);
+                        } else {
+                            alert(errMsg);
+                        }
                     }
                 });
             });
+
+            function displayResult(data) {
+                // Remove any existing results
+                $('#result-container').empty();
+
+                // Create a new result card
+                var resultCard = $('<div class="card" id="result-card"></div>');
+                var cardBody = $('<div class="card-body"></div>');
+                var cardTitle = $('<h5 class="card-title">Inference Result</h5>');
+                var resultContent = $('<p class="card-text"></p>');
+
+                // Populate the result content
+                resultContent.append('<strong>Application Type:</strong> ' + data.application_type + '<br>');
+                resultContent.append('<strong>Confidence:</strong> ' + data.confidence + '<br>');
+                resultContent.append('<strong>Inference Time:</strong> ' + data.inference_time + ' ms<br>');
+                resultContent.append('<strong>Result:</strong> ' + data.result + '<br>');
+                resultContent.append('<strong>Scores:</strong><br>');
+                var scoreList = $('<ul></ul>');
+                data.scores.forEach(function (score) {
+                    scoreList.append('<li>' + score[0] + ': ' + score[1] + '</li>');
+                });
+                resultContent.append(scoreList);
+
+                // Append elements to the card body
+                cardBody.append(cardTitle);
+                cardBody.append(resultContent);
+                resultCard.append(cardBody);
+
+                // Append the result card to the result container
+                $('#result-container').append(resultCard);
+            }
+            function displayError(errorText) {
+                // Remove any existing results
+                $('#result-container').empty();
+
+                // Create a new error card
+                var errorCard = $('<div class="card text-white bg-danger" id="result-card"></div>');
+                var cardBody = $('<div class="card-body"></div>');
+                var cardTitle = $('<h5 class="card-title">Error</h5>');
+                var errorContent = $('<p class="card-text"></p>');
+
+                // Populate the error content
+                var errorData = JSON.parse(errorText);
+                errorContent.append('<strong>Error:</strong> ' + errorData.error);
+
+                // Append elements to the card body
+                cardBody.append(cardTitle);
+                cardBody.append(errorContent);
+                errorCard.append(cardBody);
+
+                // Append the error card to the result container
+                $('#result-container').append(errorCard);
+            }
         });
+
+
     </script>
 </body>
 
