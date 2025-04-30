@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.12.3-alpine AS base
+FROM docker.io/library/python:3.12.10-alpine3.20	 AS base
 
 WORKDIR /svc
 
@@ -9,7 +9,7 @@ RUN apk update && apk add --update python3 && rm -rf /var/cache/apk/*
 RUN pip wheel -r requirements.txt --wheel-dir=/svc/wheels
 
 
-FROM python:3.12.3-alpine
+FROM docker.io/library/python:3.12.10-alpine3.20	
 
 COPY --from=base /svc /svc
 WORKDIR /svc
