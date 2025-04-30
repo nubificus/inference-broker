@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM docker.io/library/python:3.12.10-alpine3.20	 AS base
+FROM harbor.nbfc.io/proxy_cache/library/python:3.12.10-alpine3.20	 AS base
 
 WORKDIR /svc
 
@@ -9,7 +9,7 @@ RUN apk update && apk add --update python3 && rm -rf /var/cache/apk/*
 RUN pip wheel -r requirements.txt --wheel-dir=/svc/wheels
 
 
-FROM docker.io/library/python:3.12.10-alpine3.20	
+FROM harbor.nbfc.io/proxy_cache/library/python:3.12.10-alpine3.20	
 
 COPY --from=base /svc /svc
 WORKDIR /svc
